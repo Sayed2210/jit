@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>JS Paradigm Compass</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #080b14;
+    --bg2:       #0d1220;
+    --bg3:       #111827;
+    --border:    rgba(255,255,255,0.07);
+    --blue:      #38bdf8;
+    --blue-glow: rgba(56,189,248,0.25);
+    --blue-dim:  rgba(56,189,248,0.08);
+    --purple:    #c084fc;
+    --purple-glow: rgba(192,132,252,0.25);
+    --purple-dim:  rgba(192,132,252,0.08);
+    --green:     #4ade80;
+    --green-glow: rgba(74,222,128,0.25);
+    --green-dim:  rgba(74,222,128,0.08);
+    --gold:      #fbbf24;
+    --text:      #e2e8f0;
+    --muted:     #64748b;
+  }
+
+  html, body {
+    height: 100%;
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* ── GRID STARS ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(56,189,248,0.04) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(192,132,252,0.04) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(74,222,128,0.03) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* ── HEADER ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 32px;
+    background: rgba(13,18,32,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: conic-gradient(from 0deg, var(--blue), var(--purple), var(--green), var(--blue));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 800; color: #fff;
+    box-shadow: 0 0 18px rgba(192,132,252,0.4);
+    animation: spin-logo 8s linear infinite;
+  }
+  @keyframes spin-logo {
+    from { filter: hue-rotate(0deg); }
+    to   { filter: hue-rotate(360deg); }
+  }
+  .logo-text { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+  .logo-text span { color: var(--gold); }
+
+  .header-badges { display: flex; gap: 8px; }
+  .badge {
+    padding: 4px 12px; border-radius: 20px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+    cursor: pointer; transition: all 0.25s;
+  }
+  .badge-blue  { background: var(--blue-dim);   color: var(--blue);   border: 1px solid rgba(56,189,248,0.3); }
+  .badge-purple{ background: var(--purple-dim); color: var(--purple); border: 1px solid rgba(192,132,252,0.3); }
+  .badge-green { background: var(--green-dim);  color: var(--green);  border: 1px solid rgba(74,222,128,0.3); }
+  .badge:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+
+  /* ── MAIN LAYOUT ── */
+  main {
+    padding: 32px;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: 24px;
+    min-height: calc(100vh - 65px);
+  }
+
+  /* ── CENTRAL HUB ── */
+  .hub-section {
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .hub {
+    position: relative;
+    width: 160px; height: 160px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hub-ring {
+    position: absolute; inset: 0; border-radius: 50%;
+    border: 2px solid transparent;
+    background: conic-gradient(from 0deg, var(--blue), var(--purple), var(--green), var(--blue)) border-box;
+    -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: destination-out;
+    mask-composite: exclude;
+    animation: rotate-ring 4s linear infinite;
+  }
+  @keyframes rotate-ring { to { transform: rotate(360deg); } }
+
+  .hub-inner {
+    width: 120px; height: 120px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(30,40,70,0.9) 0%, rgba(14,20,40,0.95) 70%);
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 0 40px rgba(192,132,252,0.2), inset 0 0 30px rgba(56,189,248,0.05);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 4px; z-index: 2;
+  }
+  .hub-symbol { font-size: 32px; }
+  .hub-label { font-size: 9px; font-weight: 700; color: var(--gold); letter-spacing: 1px; text-align: center; }
+
+  /* ── PARADIGM BRANCHES ── */
+  .paradigms-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+
+  /* ── PANEL BASE ── */
+  .panel {
+    background: rgba(13,18,32,0.7);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .panel:hover { transform: translateY(-3px); }
+  .panel::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    border-radius: 16px 16px 0 0;
+  }
+  .panel-blue::before   { background: linear-gradient(90deg, var(--blue), transparent); box-shadow: 0 0 16px var(--blue-glow); }
+  .panel-purple::before { background: linear-gradient(90deg, var(--purple), transparent); box-shadow: 0 0 16px var(--purple-glow); }
+  .panel-green::before  { background: linear-gradient(90deg, var(--green), transparent); box-shadow: 0 0 16px var(--green-glow); }
+
+  .panel:hover.panel-blue   { box-shadow: 0 8px 32px var(--blue-glow); }
+  .panel:hover.panel-purple { box-shadow: 0 8px 32px var(--purple-glow); }
+  .panel:hover.panel-green  { box-shadow: 0 8px 32px var(--green-glow); }
+
+  .panel-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px;
+  }
+  .panel-icon {
+    width: 34px; height: 34px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .icon-blue   { background: var(--blue-dim);   border: 1px solid rgba(56,189,248,0.3); }
+  .icon-purple { background: var(--purple-dim); border: 1px solid rgba(192,132,252,0.3); }
+  .icon-green  { background: var(--green-dim);  border: 1px solid rgba(74,222,128,0.3); }
+
+  .panel-title { font-size: 15px; font-weight: 700; }
+  .panel-subtitle { font-size: 10px; color: var(--muted); margin-top: 2px; letter-spacing: 0.5px; }
+  .title-blue   { color: var(--blue); }
+  .title-purple { color: var(--purple); }
+  .title-green  { color: var(--green); }
+
+  /* ── FLOWCHART (Procedural) ── */
+  .flow-steps {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 0;
+  }
+  .flow-node {
+    width: 100%; padding: 8px 12px;
+    border-radius: 8px; font-size: 11px; font-weight: 600;
+    text-align: center; position: relative;
+    background: rgba(56,189,248,0.08);
+    border: 1px solid rgba(56,189,248,0.25);
+    color: var(--blue);
+    transition: background 0.25s;
+  }
+  .flow-node:hover { background: rgba(56,189,248,0.15); }
+  .flow-node.diamond {
+    clip-path: polygon(50% 0%,100% 50%,50% 100%,0% 50%);
+    border-radius: 0; padding: 14px;
+    font-size: 10px;
+  }
+  .flow-arrow {
+    width: 2px; height: 22px;
+    background: linear-gradient(to bottom, var(--blue), transparent);
+    margin: 0 auto;
+    position: relative;
+  }
+  .flow-arrow::after {
+    content: '▼';
+    position: absolute; bottom: -4px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px; color: var(--blue);
+  }
+  .flow-tag {
+    display: inline-block; margin-top: 3px;
+    font-size: 9px; padding: 1px 6px; border-radius: 10px;
+    background: rgba(56,189,248,0.1); color: rgba(56,189,248,0.7);
+  }
+
+  /* ── OOP DIAGRAM ── */
+  .oop-diagram { display: flex; flex-direction: column; gap: 10px; }
+  .oop-object {
+    border-radius: 10px; overflow: hidden;
+    border: 1px solid rgba(192,132,252,0.3);
+  }
+  .oop-header {
+    padding: 7px 12px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+    background: rgba(192,132,252,0.15);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .oop-header.child-obj { background: rgba(192,132,252,0.08); }
+  .oop-body { padding: 8px 12px; display: flex; flex-direction: column; gap: 5px; }
+  .oop-row {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 10px; font-family: 'Fira Code', monospace;
+  }
+  .oop-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .dot-prop { background: var(--blue); }
+  .dot-method { background: var(--green); }
+  .oop-row span { color: var(--muted); }
+  .proto-link {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 10px; color: var(--purple);
+    padding: 4px 12px;
+    background: rgba(192,132,252,0.05); border-radius: 6px;
+    border: 1px dashed rgba(192,132,252,0.3);
+  }
+  .proto-arrow { font-size: 14px; animation: pulse-proto 2s ease-in-out infinite; }
+  @keyframes pulse-proto { 0%,100%{opacity:0.5;} 50%{opacity:1;} }
+
+  /* ── FUNCTIONAL PIPELINE ── */
+  .pipeline { display: flex; align-items: center; gap: 0; flex-wrap: wrap; }
+  .pipe-fn {
+    flex: 1; min-width: 80px; padding: 10px 8px;
+    border-radius: 10px; text-align: center;
+    font-size: 10px; font-family: 'Fira Code', monospace; font-weight: 500;
+    background: rgba(74,222,128,0.08);
+    border: 1px solid rgba(74,222,128,0.25);
+    color: var(--green);
+    transition: all 0.3s; cursor: default;
+    position: relative;
+  }
+  .pipe-fn:hover {
+    background: rgba(74,222,128,0.18);
+    box-shadow: 0 0 16px var(--green-glow);
+    transform: scale(1.04);
+  }
+  .pipe-fn .fn-name { font-weight: 700; font-size: 11px; }
+  .pipe-fn .fn-desc { color: rgba(74,222,128,0.6); font-size: 9px; margin-top: 2px; }
+  .pipe-arrow {
+    width: 24px; text-align: center;
+    color: rgba(74,222,128,0.5); font-size: 14px;
+    flex-shrink: 0;
+  }
+  .pipe-badges { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+  .pipe-badge {
+    padding: 3px 8px; border-radius: 20px;
+    font-size: 9px; font-weight: 700; letter-spacing: 0.5px;
+    border: 1px solid rgba(74,222,128,0.3);
+    background: rgba(74,222,128,0.08);
+    color: rgba(74,222,128,0.8);
+  }
+
+  /* ── CODE SNIPPETS ── */
+  .code-win {
+    background: #0a0f1e;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-top: 14px;
+    font-size: 11px;
+  }
+  .code-bar {
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 12px;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid var(--border);
+  }
+  .dot { width: 9px; height: 9px; border-radius: 50%; }
+  .code-bar .fn { background:#ff5f57; }
+  .code-bar .mn { background:#febc2e; }
+  .code-bar .mx { background:#28c840; }
+  .code-filename { margin-left: 6px; font-size: 10px; color: var(--muted); font-family: 'Fira Code', monospace; }
+  pre {
+    padding: 12px; margin: 0;
+    font-family: 'Fira Code', monospace;
+    font-size: 11px; line-height: 1.7;
+    overflow-x: auto;
+    color: #abb2bf;
+  }
+  .kw { color: #c678dd; }
+  .fn-c{ color: #61afef; }
+  .str{ color: #98c379; }
+  .cmt{ color: #5c6370; font-style: italic; }
+  .num{ color: #d19a66; }
+  .var-c{ color: #e06c75; }
+
+  /* ── CENTER COLUMN (connector SVG) ── */
+  .center-col { display: flex; flex-direction: column; align-items: center; gap: 0; position: relative; }
+  .connector-svg { width: 60px; height: 100%; }
+
+  /* ── BLENDING SLIDER ── */
+  .blending-section {
+    background: rgba(13,18,32,0.8);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .blending-section::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, var(--blue-dim) 0%, var(--purple-dim) 50%, var(--green-dim) 100%);
+    pointer-events: none;
+  }
+  .blend-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .blend-title { font-size: 13px; font-weight: 700; }
+  .blend-subtitle { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .blend-tag {
+    padding: 4px 12px; border-radius: 20px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+    background: rgba(251,191,36,0.1); color: var(--gold);
+    border: 1px solid rgba(251,191,36,0.25);
+  }
+
+  .slider-row { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
+  .slider-label { font-size: 11px; font-weight: 600; min-width: 80px; }
+  input[type=range] {
+    -webkit-appearance: none; appearance: none;
+    flex: 1; height: 4px; border-radius: 2px;
+    outline: none; cursor: pointer;
+  }
+  .slider-blue { background: linear-gradient(90deg, var(--blue) calc(var(--v, 70) * 1%), rgba(255,255,255,0.1) 0%); }
+  .slider-purple{ background: linear-gradient(90deg, var(--purple) calc(var(--v, 50) * 1%), rgba(255,255,255,0.1) 0%); }
+  .slider-green  { background: linear-gradient(90deg, var(--green) calc(var(--v, 80) * 1%), rgba(255,255,255,0.1) 0%); }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 14px; height: 14px; border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 8px currentColor;
+  }
+  .slider-blue::-webkit-slider-thumb   { background: var(--blue);   }
+  .slider-purple::-webkit-slider-thumb { background: var(--purple); }
+  .slider-green::-webkit-slider-thumb  { background: var(--green);  }
+  .slider-val { font-size: 12px; font-weight: 700; min-width: 36px; text-align: right; }
+  .val-blue   { color: var(--blue); }
+  .val-purple { color: var(--purple); }
+  .val-green  { color: var(--green); }
+
+  .blend-viz {
+    display: flex; gap: 2px; height: 8px; border-radius: 4px; overflow: hidden;
+    margin-bottom: 14px;
+  }
+  .blend-bar-b { background: var(--blue); border-radius: 4px 0 0 4px; transition: flex 0.3s; }
+  .blend-bar-p { background: var(--purple); transition: flex 0.3s; }
+  .blend-bar-g { background: var(--green); border-radius: 0 4px 4px 0; transition: flex 0.3s; }
+
+  .blend-code {
+    background: #070b18; border-radius: 8px; padding: 14px;
+    font-family: 'Fira Code', monospace; font-size: 10.5px; line-height: 1.8;
+    border: 1px solid var(--border);
+    position: relative; overflow: hidden;
+  }
+  .blend-line { transition: opacity 0.4s, color 0.4s; }
+  .blend-line.dim { opacity: 0.25; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .panel { animation: fadeInUp 0.5s ease both; }
+  .panel:nth-child(1){ animation-delay: 0.1s; }
+  .panel:nth-child(3){ animation-delay: 0.2s; }
+  .panel:nth-child(4){ animation-delay: 0.3s; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1100px) {
+    .paradigms-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; }
+    .center-col { display: none; }
+  }
+  @media (max-width: 680px) {
+    .paradigms-grid { grid-template-columns: 1fr; }
+    main { padding: 16px; }
+    header { padding: 12px 16px; }
+    .header-badges { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════ HEADER ═══════ -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">JS</div>
+    <div>
+      <div class="logo-text">JS Paradigm <span>Compass</span></div>
+      <div style="font-size:10px;color:var(--muted);letter-spacing:0.5px;">Multi-Paradigm Language Architecture</div>
+    </div>
+  </div>
+  <div class="header-badges">
+    <span class="badge badge-blue">🔷 Procedural</span>
+    <span class="badge badge-purple">🔮 OOP</span>
+    <span class="badge badge-green">🌿 Functional</span>
+  </div>
+</header>
+
+<!-- ═══════ MAIN ═══════ -->
+<main>
+
+  <!-- ── CENTRAL HUB ── -->
+  <div class="hub-section">
+    <div style="text-align:center; position:relative;">
+      <div style="font-size:11px;color:var(--muted);letter-spacing:1px;margin-bottom:10px;">JAVASCRIPT ENGINE</div>
+      <div class="hub" style="margin:0 auto;">
+        <div class="hub-ring"></div>
+        <div class="hub-inner">
+          <div class="hub-symbol">⬡</div>
+          <div class="hub-label">MULTI-PARADIGM<br>CORE</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;font-size:12px;color:var(--muted);max-width:380px;">
+        JavaScript is <strong style="color:var(--text);">not bound</strong> to a single paradigm — mix and match freely within the same file.
+      </div>
+      <!-- glowing connector lines -->
+      <svg style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;overflow:visible;z-index:-1;" width="900" height="4">
+        <defs>
+          <linearGradient id="lg-blue" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="transparent"/>
+            <stop offset="50%" stop-color="#38bdf8" stop-opacity="0.6"/>
+            <stop offset="100%" stop-color="transparent"/>
+          </linearGradient>
+          <linearGradient id="lg-purple" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="transparent"/>
+            <stop offset="50%" stop-color="#c084fc" stop-opacity="0.6"/>
+            <stop offset="100%" stop-color="transparent"/>
+          </linearGradient>
+          <linearGradient id="lg-green" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="transparent"/>
+            <stop offset="50%" stop-color="#4ade80" stop-opacity="0.6"/>
+            <stop offset="100%" stop-color="transparent"/>
+          </linearGradient>
+          <filter id="glow-blue"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ── PARADIGM BRANCHES ── -->
+  <div class="paradigms-grid">
+
+    <!-- BRANCH A: PROCEDURAL -->
+    <div class="panel panel-blue" id="panel-procedural">
+      <div class="panel-header">
+        <div class="panel-icon icon-blue">🔷</div>
+        <div>
+          <div class="panel-title title-blue">Procedural Programming</div>
+          <div class="panel-subtitle">SEQUENCE OF INSTRUCTIONS</div>
+        </div>
+      </div>
+
+      <div class="flow-steps">
+        <div class="flow-node" style="background:rgba(56,189,248,0.12);">
+          📥 <strong>INPUT</strong>
+          <div class="flow-tag">data / arguments</div>
+        </div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node">
+          🔀 <strong>Task 1</strong>: Conditional
+          <div class="flow-tag">if / else / switch</div>
+        </div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node">
+          🔁 <strong>Task 2</strong>: Iteration
+          <div class="flow-tag">for / while loop</div>
+        </div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node">
+          ✏️ <strong>Task 3</strong>: Variable Update
+          <div class="flow-tag">let x = x + 1</div>
+        </div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node" style="background:rgba(56,189,248,0.12);">
+          📤 <strong>OUTPUT</strong>
+          <div class="flow-tag">return / console.log</div>
+        </div>
+      </div>
+
+      <div class="code-win">
+        <div class="code-bar">
+          <div class="dot fn"></div><div class="dot mn"></div><div class="dot mx"></div>
+          <span class="code-filename">procedural.js</span>
+        </div>
+        <pre><span class="cmt">// Procedural: step-by-step flow</span>
+<span class="kw">let</span> <span class="var-c">scores</span> = [<span class="num">72</span>, <span class="num">85</span>, <span class="num">91</span>, <span class="num">60</span>];
+<span class="kw">let</span> <span class="var-c">total</span> = <span class="num">0</span>;
+
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i &lt; scores.length; i++) {
+  <span class="kw">if</span> (scores[i] &gt;= <span class="num">70</span>) {
+    total = total + scores[i];
+  }
+}
+
+<span class="fn-c">console</span>.<span class="fn-c">log</span>(<span class="str">`Passing total: <span class="kw">${</span>total<span class="kw">}</span>`</span>);
+<span class="cmt">// → Passing total: 248</span></pre>
+      </div>
+    </div>
+
+    <!-- CENTER CONNECTOR COLUMN -->
+    <div class="center-col">
+      <svg width="60" height="100%" viewBox="0 0 60 600" preserveAspectRatio="none" style="height:100%;min-height:500px;">
+        <defs>
+          <radialGradient id="hg" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#c084fc" stop-opacity="0.8"/>
+            <stop offset="100%" stop-color="transparent"/>
+          </radialGradient>
+        </defs>
+        <!-- Blue line top -->
+        <line x1="30" y1="0" x2="30" y2="180" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.5"/>
+        <!-- Hub dot -->
+        <circle cx="30" cy="200" r="12" fill="url(#hg)" opacity="0.9"/>
+        <circle cx="30" cy="200" r="5" fill="#c084fc"/>
+        <!-- Purple line mid -->
+        <line x1="30" y1="212" x2="30" y2="350" stroke="#c084fc" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.5"/>
+        <!-- Green line bottom -->
+        <line x1="30" y1="350" x2="30" y2="600" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.5"/>
+        <!-- Cross connectors -->
+        <path d="M 30 200 Q 0 200 0 200" stroke="#38bdf8" stroke-width="1" opacity="0.3" fill="none"/>
+        <path d="M 30 200 Q 60 200 60 200" stroke="#4ade80" stroke-width="1" opacity="0.3" fill="none"/>
+      </svg>
+    </div>
+
+    <!-- BRANCH B: OOP -->
+    <div class="panel panel-purple" id="panel-oop">
+      <div class="panel-header">
+        <div class="panel-icon icon-purple">🔮</div>
+        <div>
+          <div class="panel-title title-purple">Object-Oriented (OOP)</div>
+          <div class="panel-subtitle">DATA &amp; BEHAVIOR ENCAPSULATION</div>
+        </div>
+      </div>
+
+      <div class="oop-diagram">
+        <div class="oop-object">
+          <div class="oop-header"><span>🏛️</span> <span style="color:var(--purple);">Animal</span> <span style="font-size:9px;color:var(--muted);margin-left:auto;">Base Class</span></div>
+          <div class="oop-body">
+            <div class="oop-row"><div class="oop-dot dot-prop"></div> <span style="color:var(--blue);">name</span><span>: String</span></div>
+            <div class="oop-row"><div class="oop-dot dot-prop"></div> <span style="color:var(--blue);">age</span><span>: Number</span></div>
+            <div class="oop-row"><div class="oop-dot dot-method"></div> <span style="color:var(--green);">speak()</span><span>: void</span></div>
+            <div class="oop-row"><div class="oop-dot dot-method"></div> <span style="color:var(--green);">toString()</span><span>: String</span></div>
+          </div>
+        </div>
+
+        <div class="proto-link">
+          <span class="proto-arrow">⬇</span>
+          <span>Prototype Link — <strong>[[Prototype]]</strong> chain&nbsp;</span>
+          <span style="margin-left:auto;color:var(--muted);font-size:9px;">inherits ↑</span>
+        </div>
+
+        <div class="oop-object">
+          <div class="oop-header child-obj"><span>🐕</span> <span style="color:var(--purple);">Dog</span> <span style="font-size:9px;color:var(--muted);margin-left:auto;">extends Animal</span></div>
+          <div class="oop-body">
+            <div class="oop-row"><div class="oop-dot dot-prop"></div> <span style="color:var(--blue);">breed</span><span>: String</span></div>
+            <div class="oop-row"><div class="oop-dot dot-method"></div> <span style="color:var(--green);">speak()</span><span style="color:var(--gold);"> ← override</span></div>
+            <div class="oop-row"><div class="oop-dot dot-method"></div> <span style="color:var(--green);">fetch()</span><span>: Promise</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-win">
+        <div class="code-bar">
+          <div class="dot fn"></div><div class="dot mn"></div><div class="dot mx"></div>
+          <span class="code-filename">oop.js</span>
+        </div>
+        <pre><span class="kw">class</span> <span class="fn-c">Animal</span> {
+  <span class="fn-c">constructor</span>(name) {
+    <span class="kw">this</span>.name = name;
+  }
+  <span class="fn-c">speak</span>() { <span class="kw">return</span> <span class="str">`...`</span>; }
+}
+
+<span class="kw">class</span> <span class="fn-c">Dog</span> <span class="kw">extends</span> <span class="fn-c">Animal</span> {
+  <span class="fn-c">speak</span>() {
+    <span class="kw">return</span> <span class="str">`<span class="kw">${</span><span class="kw">this</span>.name<span class="kw">}</span> barks!`</span>;
+  }
+}
+<span class="kw">const</span> d = <span class="kw">new</span> <span class="fn-c">Dog</span>(<span class="str">"Rex"</span>);
+d.<span class="fn-c">speak</span>(); <span class="cmt">// "Rex barks!"</span></pre>
+      </div>
+    </div>
+
+    <!-- BRANCH C: FUNCTIONAL -->
+    <div class="panel panel-green" id="panel-functional">
+      <div class="panel-header">
+        <div class="panel-icon icon-green">🌿</div>
+        <div>
+          <div class="panel-title title-green">Functional Programming</div>
+          <div class="panel-subtitle">FIRST-CLASS FUNCTIONS / DATA PIPELINE</div>
+        </div>
+      </div>
+
+      <div class="pipeline">
+        <div class="pipe-fn">
+          <div class="fn-name">[data]</div>
+          <div class="fn-desc">Array input</div>
+        </div>
+        <div class="pipe-arrow">▶</div>
+        <div class="pipe-fn">
+          <div class="fn-name">.map()</div>
+          <div class="fn-desc">Transform</div>
+        </div>
+        <div class="pipe-arrow">▶</div>
+        <div class="pipe-fn">
+          <div class="fn-name">.filter()</div>
+          <div class="fn-desc">Select</div>
+        </div>
+        <div class="pipe-arrow">▶</div>
+        <div class="pipe-fn">
+          <div class="fn-name">.reduce()</div>
+          <div class="fn-desc">Accumulate</div>
+        </div>
+        <div class="pipe-arrow">▶</div>
+        <div class="pipe-fn" style="background:rgba(74,222,128,0.14);">
+          <div class="fn-name">result</div>
+          <div class="fn-desc">Immutable</div>
+        </div>
+      </div>
+
+      <div class="pipe-badges">
+        <span class="pipe-badge">✅ Pure Functions</span>
+        <span class="pipe-badge">🔒 Immutability</span>
+        <span class="pipe-badge">🚫 No Side Effects</span>
+        <span class="pipe-badge">⚡ Composable</span>
+        <span class="pipe-badge">🔁 Higher-Order Fns</span>
+      </div>
+
+      <div class="code-win">
+        <div class="code-bar">
+          <div class="dot fn"></div><div class="dot mn"></div><div class="dot mx"></div>
+          <span class="code-filename">functional.js</span>
+        </div>
+        <pre><span class="cmt">// Pure, composable, no mutations</span>
+<span class="kw">const</span> scores = [<span class="num">72</span>, <span class="num">85</span>, <span class="num">91</span>, <span class="num">60</span>];
+
+<span class="kw">const</span> result = scores
+  .<span class="fn-c">filter</span>(s => s >= <span class="num">70</span>)    <span class="cmt">// select</span>
+  .<span class="fn-c">map</span>(s => s * <span class="num">1.1</span>)       <span class="cmt">// transform</span>
+  .<span class="fn-c">reduce</span>((sum, s) =>      <span class="cmt">// accumulate</span>
+    sum + s, <span class="num">0</span>);
+
+<span class="cmt">// scores unchanged — immutable!</span>
+<span class="fn-c">console</span>.<span class="fn-c">log</span>(result); <span class="cmt">// 272.8</span></pre>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── PARADIGM BLENDING SLIDER ── -->
+  <div class="blending-section">
+    <div class="blend-header">
+      <div>
+        <div class="blend-title">⚡ Paradigm Blending Studio</div>
+        <div class="blend-subtitle">Adjust how much of each paradigm appears in a single JavaScript file</div>
+      </div>
+      <div class="blend-tag">INTERACTIVE</div>
+    </div>
+
+    <div class="slider-row">
+      <span class="slider-label title-blue">🔷 Procedural</span>
+      <input type="range" id="sl-blue" class="slider-blue" min="0" max="100" value="70" style="--v:70" />
+      <span class="slider-val val-blue" id="vl-blue">70%</span>
+    </div>
+    <div class="slider-row">
+      <span class="slider-label title-purple">🔮 OOP</span>
+      <input type="range" id="sl-purple" class="slider-purple" min="0" max="100" value="50" style="--v:50" />
+      <span class="slider-val val-purple" id="vl-purple">50%</span>
+    </div>
+    <div class="slider-row">
+      <span class="slider-label title-green">🌿 Functional</span>
+      <input type="range" id="sl-green" class="slider-green" min="0" max="100" value="80" style="--v:80" />
+      <span class="slider-val val-green" id="vl-green">80%</span>
+    </div>
+
+    <div class="blend-viz">
+      <div class="blend-bar-b" id="bar-b" style="flex:70"></div>
+      <div class="blend-bar-p" id="bar-p" style="flex:50"></div>
+      <div class="blend-bar-g" id="bar-g" style="flex:80"></div>
+    </div>
+
+    <div class="blend-code" id="blend-code">
+      <div class="blend-line" id="bl-proc" style="color:var(--blue);">
+        <span class="cmt">// ── PROCEDURAL section ──────────────────</span>
+      </div>
+      <div class="blend-line" id="bl-proc2" style="color:#abb2bf;">
+        <span class="kw">let</span> <span class="var-c">rawData</span> = [<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>]; &nbsp;<span class="cmt">// mutable state</span>
+      </div>
+      <div class="blend-line" id="bl-oop" style="color:var(--purple);">
+        <span class="cmt">// ── OOP section ──────────────────────────</span>
+      </div>
+      <div class="blend-line" id="bl-oop2" style="color:#abb2bf;">
+        <span class="kw">class</span> <span class="fn-c">Processor</span> { <span class="fn-c">run</span>(data) { <span class="kw">return</span> data; } }
+      </div>
+      <div class="blend-line" id="bl-fn" style="color:var(--green);">
+        <span class="cmt">// ── FUNCTIONAL section ───────────────────</span>
+      </div>
+      <div class="blend-line" id="bl-fn2" style="color:#abb2bf;">
+        <span class="kw">const</span> out = rawData.<span class="fn-c">map</span>(x => x * <span class="num">2</span>).<span class="fn-c">filter</span>(x => x > <span class="num">15</span>);
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  function updateSlider(sliderId, valueId, barId, propName, lineId, lineId2) {
+    const slider = document.getElementById(sliderId);
+    const valueEl = document.getElementById(valueId);
+    const barEl = document.getElementById(barId);
+    const lineEl = document.getElementById(lineId);
+    const lineEl2 = document.getElementById(lineId2);
+
+    slider.addEventListener('input', () => {
+      const v = slider.value;
+      slider.style.setProperty('--v', v);
+      valueEl.textContent = v + '%';
+      barEl.style.flex = v;
+      const dim = v < 20;
+      lineEl.classList.toggle('dim', dim);
+      lineEl2.classList.toggle('dim', dim);
+    });
+  }
+
+  updateSlider('sl-blue',   'vl-blue',   'bar-b', '--v', 'bl-proc', 'bl-proc2');
+  updateSlider('sl-purple', 'vl-purple', 'bar-p', '--v', 'bl-oop',  'bl-oop2');
+  updateSlider('sl-green',  'vl-green',  'bar-g', '--v', 'bl-fn',   'bl-fn2');
+
+  // Badge hover highlights corresponding panel
+  const badges = document.querySelectorAll('.badge');
+  const panelMap = {
+    0: 'panel-procedural',
+    1: 'panel-oop',
+    2: 'panel-functional'
+  };
+  badges.forEach((badge, i) => {
+    badge.addEventListener('mouseenter', () => {
+      const panel = document.getElementById(panelMap[i]);
+      if (panel) panel.style.transform = 'translateY(-6px)';
+    });
+    badge.addEventListener('mouseleave', () => {
+      const panel = document.getElementById(panelMap[i]);
+      if (panel) panel.style.transform = '';
+    });
+  });
+
+  // Animated pipeline pulse
+  const pipeFns = document.querySelectorAll('.pipe-fn');
+  let current = 0;
+  setInterval(() => {
+    pipeFns.forEach(f => f.style.boxShadow = '');
+    pipeFns[current].style.boxShadow = '0 0 18px rgba(74,222,128,0.5)';
+    current = (current + 1) % pipeFns.length;
+  }, 900);
+</script>
+</body>
+</html>
